@@ -137,8 +137,6 @@ static int usb_pll_is_locked(void) {
   return !!(PLLCSR & (1 << PLOCK));
 }
 
-#include "dbg.h"
-
 /*===========================================================================*/
 /* Driver interrupt handlers and threads.                                    */
 /*===========================================================================*/
@@ -470,7 +468,12 @@ void usb_lld_stop(USBDriver *usbp) {
 #if AVR_USB_USE_USB1 == TRUE
     if (&USBD1 == usbp) {
       /* Disable and clear transition interrupts */
+#if !defined(__AVR_ATmega32U4__)
       USBCON &= ~((1 << VBUSTE) | (1 << IDTE));
+#else
+      USBCON &= ~(1 << VBUSTE);
+#endif
+
       USBINT = 0;
 
       /* Disable and clear device interrupts */
@@ -506,7 +509,10 @@ void usb_lld_reset(USBDriver *usbp) {
 
   /* Set Device mode */
   /* TODO: Support HOST/OTG mode if needed */
+
+#if !defined(__AVR_ATmega32U4__)
   UHWCON |= (1 << UIMOD);
+#endif
 
   /* Set FULL 12mbps speed */
   UDCON &= ~(1 << LSM);
