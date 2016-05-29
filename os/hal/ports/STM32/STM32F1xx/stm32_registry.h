@@ -138,6 +138,9 @@
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
 
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
+
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
 #define STM32_RTC_HAS_SUBSECONDS            TRUE
@@ -336,6 +339,9 @@
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
 
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
+
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
 #define STM32_RTC_HAS_SUBSECONDS            TRUE
@@ -511,6 +517,9 @@
 
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
+
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -718,6 +727,9 @@
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
 
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
+
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
 #define STM32_RTC_HAS_SUBSECONDS            TRUE
@@ -859,7 +871,10 @@
 #define STM32_HAS_DMA2D                     FALSE
 
 /* FSMC attributes.*/
-#define STM32_HAS_FSMC                      FALSE
+#define STM32_HAS_FSMC                      TRUE
+#define STM32_FSMC_IS_FMC                   FALSE
+#define STM32_FSMC_HANDLER                  Vector100
+#define STM32_FSMC_NUMBER                   48
 
 /* CRC attributes.*/
 #define STM32_HAS_CRC                       TRUE
@@ -961,6 +976,9 @@
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
 
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
+
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
 #define STM32_RTC_HAS_SUBSECONDS            TRUE
@@ -1102,7 +1120,10 @@
 #define STM32_HAS_DMA2D                     FALSE
 
 /* FSMC attributes.*/
-#define STM32_HAS_FSMC                      FALSE
+#define STM32_HAS_FSMC                      TRUE
+#define STM32_FSMC_IS_FMC                   FALSE
+#define STM32_FSMC_HANDLER                  Vector100
+#define STM32_FSMC_NUMBER                   48
 
 /* CRC attributes.*/
 #define STM32_HAS_CRC                       TRUE
@@ -1205,6 +1226,9 @@
 
 #define STM32_HAS_I2C3                      FALSE
 #define STM32_HAS_I2C4                      FALSE
+
+/* QUADSPI attributes.*/
+#define STM32_HAS_QUADSPI1                  FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE

@@ -30,6 +30,7 @@ static L3GD20Driver L3GD20D1;
 
 static int32_t rawdata[L3GD20_NUMBER_OF_AXES];
 static float cookeddata[L3GD20_NUMBER_OF_AXES];
+static float temperature;
 
 static char axesID[L3GD20_NUMBER_OF_AXES] = {'X', 'Y', 'Z'};
 static uint32_t i;
@@ -102,27 +103,15 @@ int main(void) {
   l3gd20Start(&L3GD20D1, &l3gd20cfg);
 
   while(!palReadLine(LINE_JOY_CENTER)){
-    palToggleLine(LINE_LED_RED);
-    gyroscopeReadRaw(&L3GD20D1, rawdata);
-    for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
-      chprintf(chp, "RAW-%c:%d\r\n", axesID[i], rawdata[i]);
-
-    gyroscopeReadCooked(&L3GD20D1, cookeddata);
-    for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
-      chprintf(chp, "COOKED-%c:%f\r\n", axesID[i], cookeddata[i]);
-
-    chprintf(chp, "Press JOY to continue...\r\n");
+    chprintf(chp, "Press JOY to calibrate gyroscope...\r\n");
     chThdSleepMilliseconds(150);
 #if CHPRINTF_USE_ANSI_CODE
     chprintf(chp, "\033[2J\033[1;1H");
 #endif
   }
-
-  palClearLine(LINE_LED_RED);
+  
   chprintf(chp, "Calibrating Gyroscope sampling bias...\r\n");
   chprintf(chp, "Keep it in the rest position while red LED is on\r\n");
-  chThdSleepMilliseconds(3000);
-
   palSetLine(LINE_LED_RED);
   chThdSleepMilliseconds(1000);
 
@@ -140,7 +129,10 @@ int main(void) {
 
     gyroscopeReadCooked(&L3GD20D1, cookeddata);
     for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
-      chprintf(chp, "COOKED-%c:%f\r\n", axesID[i], cookeddata[i]);
+      chprintf(chp, "COOKED-%c:%.3f\r\n", axesID[i], cookeddata[i]);
+
+    gyroscopeGetTemp(&L3GD20D1, &temperature);
+    chprintf(chp, "TEMP:%.1f C°\r\n", temperature);
 
     chThdSleepMilliseconds(150);
 #if CHPRINTF_USE_ANSI_CODE

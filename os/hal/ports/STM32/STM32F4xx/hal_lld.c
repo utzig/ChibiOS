@@ -114,9 +114,12 @@ static void hal_lld_backup_domain_init(void) {
 void hal_lld_init(void) {
 
   /* Reset of all peripherals. AHB3 is not reseted because it could have
-     been initialized in the board initialization file (board.c).*/
+     been initialized in the board initialization file (board.c) and AHB2 is not
+     present in STM32F410. */
   rccResetAHB1(~0);
+#if !defined(STM32F410xx)
   rccResetAHB2(~0);
+#endif
   rccResetAPB1(~RCC_APB1RSTR_PWRRST);
   rccResetAPB2(~0);
 
@@ -249,7 +252,7 @@ void stm32_clock_init(void) {
               STM32_HPRE;
 
   /* Flash setup.*/
-#if defined(STM32_USE_REVISION_A_FIX)
+#if !defined(STM32_REMOVE_REVISION_A_FIX)
   /* Some old revisions of F4x MCUs randomly crashes with compiler
      optimizations enabled AND flash caches enabled. */
   if ((DBGMCU->IDCODE == 0x20006411) && (SCB->CPUID == 0x410FC241))

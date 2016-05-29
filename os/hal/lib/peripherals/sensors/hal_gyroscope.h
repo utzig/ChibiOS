@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _HAL_GYROSCOPE_H_
-#define _HAL_GYROSCOPE_H_
+#ifndef HAL_GYROSCOPE_H
+#define HAL_GYROSCOPE_H
 
 #include "hal_sensors.h"
 
@@ -56,11 +56,7 @@
   /* Invoke the set sensitivity procedure.*/                                \
   msg_t (*set_sensitivity)(void *instance, float sensitivities[]);          \
   /* Restore sensitivity stored data to default.*/                          \
-  msg_t (*reset_sensitivity)(void *instance);                               \
-  /* Enable temperature drift effect compensation.*/                        \
-  msg_t (*enable_temperature_compensation)(void *instance);                 \
-  /* Disable temperature drift effect compensation.*/                       \
-  msg_t (*disable_temperature_compensation)(void *instance);                                 
+  msg_t (*reset_sensitivity)(void *instance);
   
   
 /**
@@ -162,7 +158,8 @@ typedef struct {
 /**
  * @brief   Updates gyroscope bias data from received buffer.
  * @note    The bias buffer must have the same length of the
- *          the gyroscope axes number.
+ *          the gyroscope axes number. Bias must be computed on
+ *          raw data and is a signed integer.
  *
  * @param[in] ip        pointer to a @p BaseGyroscope class.
  * @param[in] bp        pointer to a buffer of bias values.
@@ -221,34 +218,6 @@ typedef struct {
  */
 #define gyroscopeResetSensitivity(ip)                                       \
         (ip)->vmt_basegyroscope->reset_sensitivity(ip)
-
-/**
- * @brief   Enables data compensation removing temperature drift.
- *
- * @param[in] ip        pointer to a @p BaseGyroscope class.
- * 
- * @return              The operation status.
- * @retval MSG_OK       if the function succeeded.
- * @retval MSG_RESET    if one or more errors occurred.
- *
- * @api
- */
-#define gyroscopeEnableTempCompensation(ip)                                 \
-        (ip)->vmt_basegyroscope->enable_temperature_compensation(ip)		
-
-/**
- * @brief   Disable data compensation.
- *
- * @param[in] ip        pointer to a @p BaseGyroscope class.
- * 
- * @return              The operation status.
- * @retval MSG_OK       if the function succeeded.
- * @retval MSG_RESET    if one or more errors occurred.
- *
- * @api
- */
-#define gyroscopeDisableTempCompensation(ip)                                 \
-        (ip)->vmt_basegyroscope->disable_temperature_compensation(ip)			
 /** @} */
 
 /*===========================================================================*/
@@ -263,6 +232,6 @@ extern "C" {
 }
 #endif
 
-#endif /* _HAL_GYROSCOPE_H_ */
+#endif /* HAL_GYROSCOPE_H */
 
 /** @} */

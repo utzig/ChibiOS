@@ -79,6 +79,13 @@
 *****************************************************************************
 
 *** Next ***
+- HAL: Added QSPI driver implementation for STM32.
+- HAL: Added QSPI driver model.
+- VAR: Cortex-M VTOR initialization is now performed in startup files and
+       no more in port initialization.
+- VAR: Changed GCC asm files extension from .s to .S because conventions.
+- VAR: Updated CMSIS to version 4.50, it still contains the same errors
+       found in 4.30, fixes applied.
 - HAL: All high level file names have been renamed and prefixed with "hal_"
        in order to minimize the risk of name conflicts when integrating
        external libraries. 
@@ -92,7 +99,7 @@
 - RT:  Added a NASA-OSAL API emulator over the RT kernel.
 - RT:  Added RT-STM32L476-DISCOVERY demo.
 - HAL: Added more STM32L4xx testhal demos.
-- HAL: Updated all STM32F476 mcuconf.h files.
+- HAL: Updated all STM32L476 mcuconf.h files.
 - ALL: Startup files relicensed under Apache 2.0.
 - ALL: Enhanced GCC .ld files with multiple flash regions and capability to
        insert additional sections within the standard loading rules.
@@ -106,8 +113,27 @@
 - RT:  Merged RT4.
 - NIL: Merged NIL2.
 - NIL: Added STM32F7 demo.
+- HAL: Fixed wrong comments and indent in STM32F4xx and STM32F7xx 
+       hal_lld.h (bug #746).
+- HAL: Removed wrong SAI masks in STM32F4xx hal_lld.h (bug #745).
+- HAL: Fixed wrong mask placement in STM32F4xx hal_lld.h (bug #744).
+- HAL: Fixed wrong indent in STM32F4xx hal_lld.h (bug #743).
+- HAL: Removed unused macros in STM32F7xx and STM32F4xx hal_lld.h (bug #742).
+- HAL: Fixed Doxygen related macros in STM32F7xx, STM32L0xx and STM32L4xx
+       lld files (bug #741).
+- HAL: Fixed bug in VREF enable/disable functions in ADCv3 driver 
+       (bug #740)(backported to 16.1.5).
+- HAL: Fixed DAC driver not enabled for STM32F4x7 and STM32F4x9 devices
+       (bug #739)(backported to 3.0.6 and 16.1.5).
+- HAL: Fixed bug in interrupt handlers in STM32F4xx EXT driver (bug #738)
+       (backported to 16.1.5).
+- HAL: Fixed clock enabling in STM32 ADCv3 (bug #737).
+- HAL: Fixed missing SDC initialization in RT-STM32F103-OLIMEX_STM32_P103 demo
+       (bug #735)(backported to 16.1.5).
+- HAL: Fixed STM32 dac bug when using only channel 2 in direct mode (bug #734)
+       (backported to 3.0.6 and 16.1.5).
 - HAL: Fixed PAL lines support not working for STM32 GPIOv1 (bug #730)
-       (backported to 16.1.4).
+       (backported to 16.1.5).
 - RT:  Fixed bug in chSchPreemption() function (bug #728)(backported to 2.6.10,
        3.0.6 and 16.1.5).
 - HAL: Fixed prescaler not initialized in STM32 ADCv1 (bug #725)

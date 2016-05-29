@@ -26,7 +26,6 @@
  * @{
  */
 
-#include "ch.h"
 #include "hal.h"
 
 #include "l3gd20.h"
@@ -190,7 +189,7 @@ static size_t get_axes_number(void *ip) {
 }
 
 static msg_t read_raw(void *ip, int32_t axes[L3GD20_NUMBER_OF_AXES]) {
-
+  int16_t tmp;
   osalDbgCheck((ip != NULL) && (axes != NULL));
 
   osalDbgAssert((((L3GD20Driver *)ip)->state == L3GD20_READY),
@@ -205,30 +204,30 @@ static msg_t read_raw(void *ip, int32_t axes[L3GD20_NUMBER_OF_AXES]) {
            ((L3GD20Driver *)ip)->config->spicfg);
 #endif /* L3GD20_SHARED_SPI */   
   if(((L3GD20Driver *)ip)->config->axesenabling & L3GD20_AE_X){
-    axes[0] = (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                       L3GD20_AD_OUT_X_L));
-    axes[0] += (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                        L3GD20_AD_OUT_X_H) << 8);
-    axes[0] -= ((L3GD20Driver *)ip)->bias[0];
+    tmp = l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                  L3GD20_AD_OUT_X_L);
+    tmp += l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                   L3GD20_AD_OUT_X_H) << 8;
+    axes[0] = (int32_t)tmp + ((L3GD20Driver *)ip)->bias[0];
   }
   if(((L3GD20Driver *)ip)->config->axesenabling & L3GD20_AE_Y){
-    axes[1] = (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                       L3GD20_AD_OUT_Y_L));
-    axes[1] += (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                        L3GD20_AD_OUT_Y_H) << 8);
-    axes[1] -= ((L3GD20Driver *)ip)->bias[1];
+    tmp = l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                  L3GD20_AD_OUT_Y_L);
+    tmp += l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                   L3GD20_AD_OUT_Y_H) << 8;
+    axes[1] = (int32_t)tmp + ((L3GD20Driver *)ip)->bias[1];
   }
   if(((L3GD20Driver *)ip)->config->axesenabling & L3GD20_AE_Z){
-    axes[2] = (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                       L3GD20_AD_OUT_Z_L));
-    axes[2] += (int16_t)(l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
-                                        L3GD20_AD_OUT_Z_H) << 8);
-    axes[2] -= ((L3GD20Driver *)ip)->bias[2];
+    tmp = l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                  L3GD20_AD_OUT_Z_L);
+    tmp += l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                   L3GD20_AD_OUT_Z_H) << 8;
+    axes[2] = (int32_t)tmp + ((L3GD20Driver *)ip)->bias[2];
   }
 #if	L3GD20_SHARED_SPI
   spiReleaseBus(((L3GD20Driver *)ip)->config->spip);
 #endif /* L3GD20_SHARED_SPI */   
-#endif
+#endif /* L3GD20_USE_SPI */ 
   return MSG_OK;
 }
 
@@ -295,7 +294,7 @@ static msg_t reset_bias(void *ip) {
 
   osalDbgAssert((((L3GD20Driver *)ip)->state == L3GD20_READY) ||
                 (((L3GD20Driver *)ip)->state == L3GD20_STOP),
-              "reset_calibration(), invalid state");
+              "reset_bias(), invalid state");
 
   for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
     ((L3GD20Driver *)ip)->bias[i] = 0;
@@ -333,19 +332,30 @@ static msg_t reset_sensivity(void *ip) {
   else if(((L3GD20Driver *)ip)->config->fullscale == L3GD20_FS_2000DPS)
 	for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
       ((L3GD20Driver *)ip)->sensitivity[i] = L3GD20_SENS_2000DPS;
+  else {
+    osalDbgAssert(FALSE, "reset_sensivity(), full scale issue");
+    return MSG_RESET;
+  }
   return MSG_OK;
 }
 
-static msg_t enable_temperature_compensation(void *ip) {
-  (void) ip;
-  /* TODO complete this function */
-  return 0;
-}
-
-static msg_t disable_temperature_compensation(void *ip) {
-  (void) ip;
-  /* TODO complete this function */
-  return 0;
+static msg_t get_temperature(void *ip, float* tempp) {
+	
+#if L3GD20_USE_SPI
+  osalDbgAssert((((L3GD20Driver *)ip)->config->spip->state == SPI_READY),
+                "read_raw(), channel not ready");
+#if	L3GD20_SHARED_SPI
+  spiAcquireBus(((L3GD20Driver *)ip)->config->spip);
+  spiStart(((L3GD20Driver *)ip)->config->spip,
+           ((L3GD20Driver *)ip)->config->spicfg);
+#endif /* L3GD20_SHARED_SPI */   
+  *tempp = (int8_t)l3gd20SPIReadRegister(((L3GD20Driver *)ip)->config->spip,
+                                       L3GD20_AD_OUT_TEMP);
+#if	L3GD20_SHARED_SPI
+  spiReleaseBus(((L3GD20Driver *)ip)->config->spip);
+#endif /* L3GD20_SHARED_SPI */   
+#endif /* L3GD20_USE_SPI */ 
+  return MSG_OK;
 }
 
 static const struct BaseSensorVMT vmt_basesensor = {
@@ -355,9 +365,13 @@ static const struct BaseSensorVMT vmt_basesensor = {
 static const struct BaseGyroscopeVMT vmt_basegyroscope = {
   get_axes_number, read_raw, read_cooked,
   sample_bias, set_bias, reset_bias,
-  set_sensivity, reset_sensivity,
-  enable_temperature_compensation,
-  disable_temperature_compensation
+  set_sensivity, reset_sensivity
+};
+
+static const struct L3GD20VMT vmt_l3gd20 = {
+  get_axes_number, read_raw, read_cooked,
+  sample_bias, set_bias, reset_bias,
+  set_sensivity, reset_sensivity, get_temperature
 };
 
 /*===========================================================================*/
@@ -373,14 +387,13 @@ static const struct BaseGyroscopeVMT vmt_basegyroscope = {
  */
 void l3gd20ObjectInit(L3GD20Driver *devp) {
   uint32_t i;
-
   devp->vmt_basesensor = &vmt_basesensor;
   devp->vmt_basegyroscope = &vmt_basegyroscope;
-  devp->vmt = (struct L3GD20VMT*) &vmt_basegyroscope;
-  devp->state  = L3GD20_STOP;
+  devp->vmt_l3gd20 = &vmt_l3gd20;
   devp->config = NULL;
   for(i = 0; i < L3GD20_NUMBER_OF_AXES; i++)
     devp->bias[i] = 0;
+  devp->state  = L3GD20_STOP;
 }
 
 /**
@@ -392,7 +405,7 @@ void l3gd20ObjectInit(L3GD20Driver *devp) {
  * @api
  */
 void l3gd20Start(L3GD20Driver *devp, const L3GD20Config *config) {
-  uint8_t i;
+  uint32_t i;
   osalDbgCheck((devp != NULL) && (config != NULL));
 
   osalDbgAssert((devp->state == L3GD20_STOP) || (devp->state == L3GD20_READY),

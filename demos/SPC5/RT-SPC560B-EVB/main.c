@@ -104,7 +104,6 @@ static THD_FUNCTION(Thread1, arg) {
  * Application entry point.
  */
 int main(void) {
-  thread_t *shelltp = NULL;
 
   /*
    * System initializations.
@@ -139,7 +138,6 @@ int main(void) {
                                             "shell", NORMALPRIO + 1,
                                             shellThread, (void *)&shell_cfg1);
     chThdWait(shelltp);               /* Waiting termination.             */
-    chThdFreeToHeap(shelltp);         /* Returning memory to heap.        */
     chThdSleepMilliseconds(1000);
   }
   return 0;
