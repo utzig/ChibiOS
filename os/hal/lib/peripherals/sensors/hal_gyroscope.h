@@ -101,12 +101,12 @@ typedef struct {
  * @brief   Gyroscope get axes number.
  *
  * @param[in] ip        pointer to a @p BaseGyroscope class.
- * @return              The number of axes of the BaseSensor
+ * @return              The number of axes of the BaseGyroscope
  *
  * @api
  */
 #define gyroscopeGetAxesNumber(ip)                                          \
-        (ip)->vmt_basegyroscope->get_axes_number(ip)
+        (ip)->vmt_basegyroscope->get_channels_number(ip)
 
 /**
  * @brief   Gyroscope read raw data.

@@ -14,6 +14,8 @@
     limitations under the License.
 */
 
+#include <string.h>
+
 #include "ch.h"
 #include "hal.h"
 
@@ -79,6 +81,7 @@ static THD_FUNCTION(Thread1, arg) {
  */
 int main(void) {
   flash_error_t err;
+  uint8_t *addr;
 
   /*
    * System initializations.
@@ -106,6 +109,11 @@ int main(void) {
   m25qObjectInit(&m25q);
   m25qStart(&m25q, &m25qcfg1);
 
+  /* Reading.*/
+  err = flashRead(&m25q, 0, 128, buffer);
+  if (err != FLASH_NO_ERROR)
+    chSysHalt("read error");
+
   /* Erasing the first sector and waiting for completion.*/
   (void) flashStartEraseSector(&m25q, 0);
   err = flashWaitErase((BaseFlash *)&m25q);
@@ -118,7 +126,7 @@ int main(void) {
     chSysHalt("verify erase error");
 
   /* Programming a pattern.*/
-  err = flashProgram(&m25q, 0, pattern, 128);
+  err = flashProgram(&m25q, 0, 128, pattern);
   if (err != FLASH_NO_ERROR)
     chSysHalt("program error");
 
@@ -127,8 +135,21 @@ int main(void) {
   if (err != FLASH_ERROR_VERIFY)
     chSysHalt("verify non-erase error");
 
+  /* Memory mapping the device.*/
+  m25qMemoryMap(&m25q, &addr);
+
+  /* Unmapping the device.*/
+  m25qMemoryUnmap(&m25q);
+
   /* Reading it back.*/
-  err = flashRead(&m25q, 0, buffer, 128);
+  memset(buffer, 0, 128);
+  err = flashRead(&m25q, 16, 128, buffer);
+  if (err != FLASH_NO_ERROR)
+    chSysHalt("read error");
+
+  /* Reading it back.*/
+  memset(buffer, 0, 128);
+  err = flashRead(&m25q, 0, 128, buffer);
   if (err != FLASH_NO_ERROR)
     chSysHalt("read error");
 
